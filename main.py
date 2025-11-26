@@ -2,6 +2,10 @@ from InventoryManager import InventoryManager
 from User import User
 
 def display_products(products):
+    if not products:
+        print("\nNo products found in this inventory!")
+        return
+    
     print("\n" + "="*40)
     print("Products in Inventory")
     print("="*40)
@@ -11,6 +15,10 @@ def display_products(products):
 
 
 def display_inventories(inventories):
+    if not inventories:
+        print("\nNo inventories found!")
+        return
+    
     print("\n" + "="*40)
     print("Inventories")
     print("="*40)
@@ -48,39 +56,90 @@ def main():
     if not user:
         print("Invalid email or password!")
         return
-
+    
+    print(f"Welcome, {user.email}!")
     inventory_manager = InventoryManager()
-    inventory = inventory_manager.create_inventory(100)
-    inventory_manager.create_inventory(200)
 
-    # Add products to inventory
-    inventory_manager.add_product(inventory.inventory_id, 1, "Empress Eugénie tiara", 100, 10)
-    inventory_manager.add_product(inventory.inventory_id, 2, "Reliquary brooch", 200, 20)
-    inventory_manager.add_product(inventory.inventory_id, 3, "Sapphire tiara", 300, 30)
+    while True:
+        try:
+            display_menu()
+            choice = input("\nEnter your choice (1-9): ")
 
-    # View products in inventory
-    products = inventory_manager.get_products_in_inventory(inventory.inventory_id)
-    display_products(products)
+            if choice == '1':
+                # Create New Inventory
+                capacity = int(input("Enter inventory capacity: "))
+                inventory_manager.create_inventory(capacity)
 
-    # Update product
-    inventory_manager.update_product(inventory.inventory_id, 1, "Empress Eugénie tiara", 200, 10)
-    products = inventory_manager.get_products_in_inventory(inventory.inventory_id)
-    display_products(products)
+            elif choice == '2':
+                # Add Product to Inventory
+                inventory_id = int(input("Enter inventory ID: "))
+                name = input("Enter product name: ")
+                price = float(input("Enter product price: "))
+                quantity = int(input("Enter product quantity: "))
+                inventory_manager.add_product(inventory_id, name, price, quantity)
 
-    # Remove product
-    inventory_manager.remove_product(inventory.inventory_id, 1)
-    products = inventory_manager.get_products_in_inventory(inventory.inventory_id)
-    display_products(products)
+            elif choice == '3':
+                # View All Inventories
+                inventories = inventory_manager.inventories
+                display_inventories(inventories)
 
-    # Update inventory capacity
-    inventory_manager.update_inventory_capacity(inventory.inventory_id, 200)
-    inventory = inventory_manager.get_inventory_by_id(inventory.inventory_id)
-    print(f"Inventory {inventory.inventory_id} capacity updated to {inventory.capacity}")
+            elif choice == '4':
+                # View Products in Inventory
+                inventory_id = int(input("Enter inventory ID: "))
+                products = inventory_manager.get_products_in_inventory(inventory_id)
+                display_products(products)
 
-    # Delete inventory
-    inventory_manager.delete_inventory(inventory.inventory_id)
-    inventories = inventory_manager.get_all_inventories()
-    display_inventories(inventories)
+            elif choice == '5':
+                # Update Product
+                inventory_id = int(input("Enter inventory ID: "))
+                product_id = int(input("Enter product ID: "))
+                name = input("Enter new product name (leave blank to keep current): ")
+                price_input = input("Enter new product price (leave blank to keep current): ")
+                price = float(price_input) if price_input else None
+                quantity_input = input("Enter new product quantity (leave blank to keep current): ")
+                quantity = int(quantity_input) if quantity_input else None
+                inventory_manager.update_product(inventory_id, product_id, name, price, quantity)
+
+            elif choice == '6':
+                # Update Inventory Capacity
+                inventory_id = int(input("Enter inventory ID: "))
+                capacity = int(input("Enter new capacity: "))
+                inventory_manager.update_inventory_capacity(inventory_id, capacity)
+
+            elif choice == '7':
+                # Delete Product
+                inventory_id = int(input("Enter inventory ID: "))
+                product_id = int(input("Enter product ID: "))
+                inventory_manager.remove_product(inventory_id, product_id)
+
+            elif choice == '8':
+                # Delete Inventory
+                inventory_id = int(input("Enter inventory ID: "))
+                confirm = input(f"Are you sure you want to delete inventory {inventory_id}? (yes/no): ")
+                if confirm.lower() == 'yes':
+                    inventory_manager.delete_inventory(inventory_id)
+
+            elif choice == '9':
+                # Exit
+                print("\nThank you for using the Inventory Management System!")
+                break
+
+            else:
+                print("\nInvalid choice! Please enter a number between 1-9.")
+
+        except ValueError as e:
+            print(f"\nError: Invalid input! Please enter valid numbers. ({e})")
+        except KeyboardInterrupt:
+            print("\n\nOperation cancelled by user.")
+            print("Thank you for using the Inventory Management System!")
+            break
+        except Exception as e:
+            print(f"\nAn unexpected error occurred: {e}")
+            print("Please try again.")
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"\nFatal error: {e}")
+        print("The application has encountered an error and needs to close.")

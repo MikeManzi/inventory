@@ -8,7 +8,6 @@ Base.metadata.create_all(engine)
 class InventoryManager:
     def __init__(self):
         self._session = Session()
-        # self.user = user
 
     @staticmethod
     def _generate_id():
@@ -22,7 +21,8 @@ class InventoryManager:
         print(f"Inventory {inventory_id} created successfully!")
         return inventory
     
-    def add_product(self, inventory_id, product_id, name, price, quantity):
+    def add_product(self, inventory_id, name, price, quantity):
+        product_id = self._generate_id()
         product = Product(id=product_id, name=name, price=price, quantity=quantity)
         inventory = self._get_inventory_by_id(inventory_id)
         
